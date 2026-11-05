@@ -35,3 +35,22 @@ html[data-theme=dark]{color-scheme:dark;--bg:#111b1a;--surface:#1c2927;--surface
 @media(max-width:870px){#app:has(textarea:focus) .lesson-nav,#app:has(input.field:focus) .lesson-nav,#app:has(select:focus) .lesson-nav{position:static}}
 .lookup-card{position:sticky;top:88px;z-index:12;box-shadow:var(--shadow-lg)}
 @media(max-width:870px){.lookup-card{top:72px}}
+/* Typography and reading refinements */
+@font-face{font-family:Manrope;src:url('../assets/fonts/Manrope-Variable.ttf') format('truetype');font-style:normal;font-weight:400 800;font-display:swap}
+:root{--font:Manrope,'Segoe UI',sans-serif;--shadow:0 8px 28px rgba(36,56,46,.045)}
+body{font-size:16px;line-height:1.65}
+h1,h2,h3,h4{letter-spacing:-.025em;text-wrap:balance}
+h1{line-height:1.13}h2{line-height:1.25}h3{line-height:1.4}
+.nav-item{font-size:14px}.top-title{font-size:14px}.brand-sub,.nav-group-label{letter-spacing:.08em}
+.btn{font-size:14px}.btn.small-btn{font-size:13px}.field-label{font-size:13px}
+.hero{background:#21483f;border-radius:24px}.hero h1{letter-spacing:-.035em;line-height:1.1}.hero p{font-size:16px;line-height:1.7}.hero-meta{font-size:12px;line-height:1.5}
+.card,.lesson-section{box-shadow:var(--shadow)}
+.page-header p,.lesson-head p{line-height:1.7}
+.eyebrow,.module-tag,.word-meta{letter-spacing:.09em}
+.reading-article{max-width:72ch;line-height:1.85}.reading-article p{margin-bottom:1.3em}
+.dialogue-bubble{line-height:1.7}.question h3{line-height:1.5}.option{line-height:1.55}
+.stat-label,.stat-foot,.lesson-mini p,.setting-row p{font-size:13px}
+.topbar{backdrop-filter:none}
+@media(max-width:620px){body{font-size:16px}.hero p{font-size:15px}.hero-meta{font-size:12px}.nav-item{font-size:14px}.stat-label{font-size:12px}.stat-foot{font-size:12px}.mobile-nav button{font-size:11px}.section-heading h2{font-size:23px}.question{padding:18px}.reading-article{font-size:16px;line-height:1.8}.lesson-section{padding:20px}}
+@media(max-width:620px){.top-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.top-chip{flex-shrink:0;white-space:nowrap}.top-actions{flex-shrink:0}.hero h1{text-wrap:balance}.module-tile{min-height:145px}}
+@media(max-width:620px){.topbar>.row{min-width:0;flex:1}.topbar>.row .icon-btn{flex-shrink:0}.top-title{display:block}}

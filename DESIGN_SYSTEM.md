@@ -6,7 +6,7 @@ Premium minimalist EdTech, optimised for calm daily focus rather than gamified v
 
 ## Design tokens and typography
 
-The canonical tokens are defined in `src/styles.css` and include backgrounds, elevated surfaces, ink/muted text, state colours, borders, shadows, focus indicator, radii and spacing. Colour modes are controlled by `html[data-theme="system|light|dark"]`, with `prefers-color-scheme` used for the system setting. Fonts deliberately use a native system fallback stack: no external network font is loaded, improving startup reliability and privacy. Russian Cyrillic and English Latin script are both supported.
+The canonical tokens are defined in `src/styles.css` and include backgrounds, elevated surfaces, ink/muted text, state colours, borders, shadows, focus indicator, radii and spacing. Colour modes are controlled by `html[data-theme="system|light|dark"]`, with `prefers-color-scheme` used for the system setting. The interface uses the self-hosted Manrope variable font with a system fallback. The font is included in the offline cache, so it does not require an external font service. Russian Cyrillic and English Latin script are both supported.
 
 Major headings use fluid type; academic reading text is larger with generous leading. Controls have a minimum recommended interactive height of about 44–48 CSS pixels; small toolbar-only controls retain accessible labels.
 
