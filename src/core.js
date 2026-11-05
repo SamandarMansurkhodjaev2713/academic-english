@@ -3,7 +3,7 @@
  'use strict';
  const VERSION=1;
  const STORAGE_KEY='acls_progress_v1';
- const stages=['Начало','Vocabulary','Reading','Reading check','Listening','Listening check','Grammar','Practice','Speaking','Workplace challenge','Результат'];
+ const stages=['Начало','Vocabulary','Reading','Reading check','Dialogue','Dialogue check','Grammar','Practice','Speaking','Workplace challenge','Результат'];
  function localDate(d=new Date()) {const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`;}
  function addDays(dateString,n){const parts=dateString.split('-').map(Number);const d=new Date(parts[0],parts[1]-1,parts[2]+n,12,0);return localDate(d);}
  function normalize(text){return String(text||'').toLocaleLowerCase('en').normalize('NFKC').replace(/[’‘]/g,"'").replace(/[^\p{L}\p{N}']+/gu,' ').replace(/\s+/g,' ').trim();}
