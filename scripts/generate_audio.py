@@ -12,8 +12,10 @@ for l in data['lessons']:
  for v in l['vocab']: add(v['term'])
  for v in l['phrases']: add(v['en'])
  add(l['speaking']['prompt'])
+ voices=['en-GB-SoniaNeural','en-GB-RyanNeural','en-GB-LibbyNeural','en-GB-ThomasNeural','en-GB-MaisieNeural','en-US-AndrewNeural']
+ speakers=list(dict.fromkeys(line['speaker'] for line in l['dialogue']['lines']))
  for i,line in enumerate(l['dialogue']['lines']):
-  add(line['text'], 'en-GB-SoniaNeural' if i%2==0 else 'en-GB-RyanNeural')
+  add(line['text'], voices[speakers.index(line['speaker']) % len(voices)])
   if i==0: add(line['text'])
 (root/'assets/audio-map.js').write_text('window.ACADEMIC_AUDIO='+json.dumps(items,ensure_ascii=False,separators=(',',':'))+';',encoding='utf-8')
 sem=asyncio.Semaphore(8)
