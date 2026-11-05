@@ -24,7 +24,7 @@ Do **not** rely on double-clicking `index.html` through `file://`: Web Speech, s
 - **30 authored days** across five Academic Support modules; each lesson has four specific outcomes, ten lexical items, six useful phrases, an original reading (201–231 English words), an eight-or-more-turn professional dialogue, grammar in context, reading/listening checks, practice tasks, a speaking scenario and written workplace challenge.
 - **Exercise engine:** multiple choice, text gaps, matching, ordering words, error correction, situational decisions, and self-checked translation.
 - **Vocabulary Trainer:** 300 lexical entries (289 distinct English expressions), 180 functional phrases, flashcard reveal, both directions, personalised spaced review (four recall ratings), saved words and difficulty filter.
-- **Listening Studio:** 30 dialogue scripts rendered through browser speech synthesis with play/stop controls, text transcript, comprehension exercises and playback speed settings.
+- **Listening Studio:** 30 dialogue scripts with prerecorded synthetic English voices with play/stop controls, text transcript, comprehension exercises and playback speed settings.
 - **Conversation Lab:** guided / standard / independent role-play. The learner practices as an Academic Support Officer or as the learner in Day 30; dialogue models come from authored lesson scripts.
 - **Microphone practice:** browser-native recording and playback using MediaRecorder (where available), optional SpeechRecognition transcription (where available), manual text alternative, model answer and self-review rubric.
 - **Reading interaction:** click words and known multiword terms for an offline glossary lookup; missing glossary entries are disclosed rather than invented.
@@ -124,3 +124,5 @@ Progress is stored in browser `localStorage`. The app does not send progress, no
 For candid details about speech quality, exact dictionary coverage, offline limits, and testing coverage, read [LIMITATIONS.md](LIMITATIONS.md) and [QA_REPORT.md](QA_REPORT.md).
 
 **Scope:** The 30-day programme builds professional confidence through repeated workplace practice. It does not guarantee a full CEFR level increase in a month.
+
+Audio uses prerecorded synthetic English voices. Clips are downloaded on first playback and cached for subsequent offline use; the entire audio library is not pre-cached.
