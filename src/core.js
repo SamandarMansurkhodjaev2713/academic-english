@@ -63,14 +63,27 @@
   const practicedWriting=Object.values(data.lessons).filter(x=>x.writing?.practised).length;
   const today=localDate();const due=Object.values(data.reviews).filter(x=>dueReview(x,today)).length;
   const totalReviewed=Object.keys(data.reviews).length;
-  const mastery={};for(const skill of ['reading','listening','grammar','vocabulary','workplace']) {const subset=measured.filter(x=>x.skill===skill);mastery[skill]={count:subset.length,correct:subset.filter(x=>x.correct).length,pct:subset.length?Math.round(subset.filter(x=>x.correct).length/subset.length*100):null};}
+  const mastery={};for(const skill of ['reading','listening','grammar','vocabulary','workplace']) {const subset=measured.filter(x=>x.skill===skill);const first=new Map();for(const attempt of data.attempts)if(attempt.skill===skill){const key=`day-${String(attempt.day).padStart(2,'0')}:${attempt.id}`;if(!first.has(key))first.set(key,!!attempt.correct);}const comparable=[...bestById.entries()].filter(([key,a])=>a.skill===skill&&first.has(key));mastery[skill]={count:subset.length,correct:subset.filter(x=>x.correct).length,pct:subset.length?Math.round(subset.filter(x=>x.correct).length/subset.length*100):null,trend:{count:comparable.length,firstCorrect:comparable.filter(([key])=>first.get(key)).length,lastCorrect:comparable.filter(([,a])=>a.correct).length}};}
   // XP granted once per successful exercise ID and once per completed stage; no rewards for simply opening the app.
   const uniqueSuccess=new Set(data.attempts.filter(x=>x.correct).map(x=>`${x.day}:${x.id}`));
   const stagePoints=Object.values(data.lessons).reduce((sum,l)=>sum+(l.doneStages?.length||0)*3,0);
   const xp=uniqueSuccess.size*10+stagePoints+finished*75+Object.values(data.reviews).reduce((sum,r)=>sum+(r.history?.length||0)*2,0);
   return {finished,attempted,correct,measured:measured.length,accuracy,practicedSpeaking,practicedWriting,due,totalReviewed,xp,streak:streak(data.activities,today),mastery};
  }
- function MC(id,skill,label,q){return {id,type:'choice',skill,label,q:q.q,options:q.options,answer:q.answer,explanation:q.explanation};}
+ // Authored scenarios: feedback describes each choice in this specific context.
+ const workplaceCases={
+  2:{q:'A student asks for a missing document update. Your team has received the request, but the decision belongs to another office. What is the best reply?',options:['Your request is approved. I will send the document tomorrow.','We have received your request. I will check its status with the responsible team and update you when I have confirmed information.','This is not our problem. Contact someone else.'],answer:1,explanation:'Confirm receipt, identify the next action, and avoid promising an outcome you cannot authorise.',optionExplanations:['Receipt is not approval, and neither a decision nor a delivery date has been confirmed.','This acknowledges the request, explains a realistic next step and avoids an unsupported promise.','This dismisses the student without helping them reach the responsible team.']},
+  6:{q:'A colleague asks to move a meeting. You do not yet know whether all participants are free. What should you write?',options:['Thursday at 14:00 is confirmed for everyone.','Could you please share your availability for Thursday? I will check with the other participants before confirming.','Meeting cancelled.'],answer:1,explanation:'Ask for availability and check with participants before confirming a new time.',optionExplanations:['The time has not yet been agreed by everyone, so this confirmation is premature.','It makes the next step clear and does not imply a decision has already been made.','A request to reschedule does not necessarily mean the meeting is cancelled.']},
+  11:{q:'A student submits an incomplete request. You have verified that a signed form is required. Which response is most useful?',options:['Your application is invalid.','Please send the signed form so we can check whether your request is complete. Let me know if you need help locating it.','Send every personal document you have.'],answer:1,explanation:'Name the verified missing item, explain its purpose, and offer a practical next step.',optionExplanations:['This is abrupt and does not tell the student how to proceed.','It identifies the required form and gives the student a clear, supportive action.','Requesting unnecessary personal documents is disproportionate and may expose sensitive information.']},
+  16:{q:'An international partner asks you to share a student record. You have not verified consent or the authorised procedure. What should you do?',options:['Send the record immediately to be helpful.','Check the applicable consent and sharing procedure with the authorised team before sending anything.','Promise the record will be sent today.'],answer:1,explanation:'Verify consent and the institution’s authorised process before sharing personal information.',optionExplanations:['Sharing without verifying authorisation can disclose personal information improperly.','This protects the student’s information and directs the request through the correct process.','A deadline should not be promised before permission and the process are confirmed.']}
+ };
+ function reviewPlan(data,content,today=localDate()){
+  const ids=new Set(content.lessons.flatMap(l=>l.vocab.map(v=>v.id)));
+  const due=Object.entries(data.reviews).filter(([id,r])=>ids.has(id)&&dueReview(r,today)).sort((a,b)=>(a[1].next||'').localeCompare(b[1].next||'')).map(([id])=>id);
+  const mistakes=[];for(const lesson of content.lessons){const answers=data.lessons[lesson.id]?.answers||{};for(const [id,a] of Object.entries(answers))if(a&&!a.correct)mistakes.push({day:lesson.day,id,updatedAt:a.updatedAt||''});}
+  mistakes.sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt));return {due,mistakes};
+ }
+ function MC(id,skill,label,q){return {id,type:'choice',skill,label,q:q.q,options:q.options,answer:q.answer,explanation:q.explanation,optionExplanations:q.optionExplanations};}
  function getLessonExercises(l){const reading=l.readingChecks.map((q,i)=>MC(`${l.id}-reading-${i}`,'reading','Reading comprehension',q));
   const listening=l.listeningChecks.map((q,i)=>MC(`${l.id}-listening-${i}`,'listening','Listening comprehension',q));
   const grammar=[MC(`${l.id}-grammar`,'grammar','Grammar in context',l.grammarCheck), {id:`${l.id}-correction`,type:'self',skill:'grammar',label:'Error correction',q:`Correct this sentence: ${l.errorCorrection.incorrect}`,sample:l.errorCorrection.correct,explanation:l.errorCorrection.explanation}];
@@ -83,8 +96,9 @@
   const terms=l.vocab.slice(2,6);const match={id:`${l.id}-match`,type:'match',skill:'vocabulary',label:'Match terms and meanings',items:terms.map(v=>({id:v.id,term:v.term,ru:v.ru}))};
   const phrase=l.phrases[0];const build={id:`${l.id}-builder`,type:'builder',skill:'workplace',label:'Build a useful phrase',q:phrase.ru,answer:phrase.en};
   const situation=MC(`${l.id}-situation`,'workplace','Professional decision',l.situational);
+  const workplaceCase=workplaceCases[l.day]?MC(`${l.id}-case`,'workplace','Workplace case · разбор ситуации',workplaceCases[l.day]):null;
   const translation={id:`${l.id}-translation`,type:'self',skill:'writing',label:'Translate into English',q:l.phrases[1].ru,sample:l.phrases[1].en,explanation:'Several professional translations may be valid. Compare tone and meaning with this model.'};
-  return {reading,listening,grammar,practice:[...fill,match,build,situation,translation]};
+  return {reading,listening,grammar,practice:[...fill,match,build,situation,...(workplaceCase?[workplaceCase]:[]),translation]};
  }
  function achievements(data,content){const s=stats(data,content);return [
   {id:'first',icon:'spark',name:'First Steps',desc:'Завершить первый урок',earned:s.finished>=1},
@@ -96,5 +110,5 @@
  ];}
  function assessmentQuestions(content,type){return content.assessments[type]||[];}
  function assessmentScore(answers,questions){const valid=questions.filter(q=>Object.prototype.hasOwnProperty.call(answers||{},q.id));return {correct:valid.filter(q=>Number(answers[q.id])===q.answer).length,total:questions.length,answered:valid.length,pct:valid.length===questions.length?Math.round(100*valid.filter(q=>Number(answers[q.id])===q.answer).length/questions.length):null};}
- return {VERSION,STORAGE_KEY,stages,localDate,addDays,normalize,init,sanitizeProgress,load,persist,lessonState,activity,recordAnswer,markStage,completeLesson,dueReview,review,streak,stats,getLessonExercises,achievements,assessmentQuestions,assessmentScore};
+ return {VERSION,STORAGE_KEY,stages,localDate,addDays,normalize,init,sanitizeProgress,load,persist,lessonState,activity,recordAnswer,markStage,completeLesson,dueReview,review,streak,stats,reviewPlan,getLessonExercises,achievements,assessmentQuestions,assessmentScore};
 });

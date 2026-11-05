@@ -1,5 +1,5 @@
 /* Offline fallback scoped to this application. */
-const CACHE='academic-english-offline-v5';
+const CACHE='academic-english-offline-v6';
 const STATIC=['./','./index.html','./src/styles.css','./src/core.js','./src/app.js','./content/curriculum.js','./content/curriculum.json','./assets/favicon.svg','./assets/fonts/Manrope-Variable.ttf'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(STATIC)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(Promise.all([caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('academic-english-offline-')&&k!==CACHE).map(k=>caches.delete(k)))),self.clients.claim()])));
